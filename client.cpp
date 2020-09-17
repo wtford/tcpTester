@@ -11,6 +11,31 @@
 
 int main(int argCount, char *argValues[])
 {
+    if (argCount < 2)
+    {
+        std::cerr << "usage: " << argValues[0] << " address" << std::endl;
+        return 0;
+    }
+
+    // Create socketAddress
+    struct sockaddr_in socketAddress;
+    memset(&socketAddress, 0, sizeof(socketAddress));
+    socketAddress.sin_family = AF_INET;
+    socketAddress.sin_port = htons(portNumber);
+
+    // Parse ip address
+    int ipAddressResult = inet_pton(
+        AF_INET,
+        argValues[1],
+        &socketAddress.sin_addr);
+    
+    if (-1 == ipAddressResult)
+    {
+        // Handle inet_pton() error
+        std::cerr << "inet_pton() error" << std::endl;
+        return -1;
+    }
+
     // Create socketDescriptor
     int socketDescriptor = socket(
         AF_INET,
@@ -25,30 +50,12 @@ int main(int argCount, char *argValues[])
         return -1;
     }
 
-    // Create socketAddress
-    struct sockaddr_in socketAddress;
-    memset(&socketAddress, 0, sizeof(socketAddress));
-    socketAddress.sin_family = AF_INET;
-    socketAddress.sin_port = htons(portNumber);
-
-    int result = inet_pton(
-        AF_INET,
-        "127.0.0.1",
-        &socketAddress.sin_addr);
-    
-    if (-1 == result)
-    {
-        // Handle inet_pton() error
-        std::cerr << "inet_pton() error" << std::endl;
-        return -1;
-    }
-
-    result = connect(
+    int connectResult = connect(
         socketDescriptor,
         reinterpret_cast<sockaddr*>(&socketAddress),
         sizeof(socketAddress));
 
-    if (-1 == result)
+    if (-1 == connectResult)
     {
         // Handle connect() error
         std::cerr << "connect() error" << std::endl;
