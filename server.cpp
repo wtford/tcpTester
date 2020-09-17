@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cstring>
 
 #include <sys/socket.h> // socket(), listen(), accept()
 #include <netinet/in.h> // sockaddr_in
