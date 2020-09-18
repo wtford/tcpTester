@@ -72,7 +72,5 @@ int main(int argCount, char *argValues[])
     
     std::cout << "Message sent: " << message << std::endl;
 
-    sleep(5);
-
     return 0;
 }

@@ -1,7 +1,8 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <cstring>
-
+#include <ctime> // time_t, time(), tm, strftime
 #include <sys/socket.h> // socket(), listen(), accept()
 #include <netinet/in.h> // sockaddr_in
 #include <unistd.h> // read()
@@ -10,6 +11,17 @@
 
 int main(int argCount, char *argValues[])
 {
+    time_t timeNow = time(0);
+    tm *localTimeNow = localtime(&timeNow);
+    char logFileName[sizeof("tcpServer_2020-09-17_2221.log")];
+    size_t timeSize = strftime(
+        logFileName,
+        sizeof(logFileName),
+        "tcpServer_%F_%H%M.log",
+        localTimeNow);
+    std::ofstream logFile;
+    logFile.open(logFileName);
+    
     // Create socketDescriptor
     int socketDescriptor = socket(
         AF_INET,
@@ -81,13 +93,13 @@ int main(int argCount, char *argValues[])
         while (1)
         {
             int byteCount;
-            char buffer[1024];
+            char tcpBuffer[1024];
 
             // Read in data
             byteCount = read(
                 clientDescriptor,
-                buffer,
-                sizeof(buffer));
+                tcpBuffer,
+                sizeof(tcpBuffer));
 
             if (byteCount <= 0)
             {
@@ -97,7 +109,18 @@ int main(int argCount, char *argValues[])
             }
 
             // Handle data
-            std::cout << "Received: " << buffer << std::endl;
+            std::cout << "Received: " << tcpBuffer << std::endl;
+            timeNow = time(0);
+            localTimeNow = localtime(&timeNow);
+            char timeStampBuffer[sizeof("2020-09-17_22:34:00")];
+            timeSize = strftime(
+                timeStampBuffer,
+                sizeof(timeStampBuffer),
+                "%F %H:%M:%S",
+                localTimeNow);
+            logFile << timeStampBuffer << " " << tcpBuffer << std::endl;
         }
     }
+
+    logFile.close();
 }
