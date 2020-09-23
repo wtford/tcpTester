@@ -114,6 +114,9 @@ int main(int argCount, char *argValues[])
 
         // Set recieve timeout
 
+        struct timeval timeValue = {1,0};
+        int returnValue;
+        
         returnValue = setsockopt(
             clientDescriptor,
             SOL_SOCKET,
@@ -148,7 +151,7 @@ int main(int argCount, char *argValues[])
             }
 
             // Handle data
-            std::cout << tcpBuffer << std::endl;
+            std::cout << "Received: " << tcpBuffer << std::endl;
             timeNow = time(0);
             localTimeNow = localtime(&timeNow);
             char timeStampBuffer[sizeof("2020-09-17_22:34:00")];
