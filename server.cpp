@@ -36,10 +36,26 @@ int main(int argCount, char *argValues[])
     }
 
     int optionValue= 1;
-    if (setsockopt(socketDescriptor, SOL_SOCKET, SO_REUSEADDR, &optionValue, sizeof(int)) < 0)
+    int returnValue;
+    returnValue = setsockopt(
+        socketDescriptor,
+        SOL_SOCKET,
+        SO_REUSEADDR,
+        &optionValue,
+        sizeof(int));
+    if (returnValue < 0)
     {
 	    std::cerr << "setsockopt(SO_REUSEADDR) failed" << std::endl;
     }
+    
+    struct timeval timeValue = {0,500};
+
+    returnValue = setsockopt(
+        socketDescriptor,
+        SOL_SOCKET,
+        SO_RCVTIMEO,
+        &timeValue,
+        sizeof(int));
 
     // Create socketAddress
     struct sockaddr_in socketAddress;
