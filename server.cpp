@@ -134,7 +134,7 @@ int main(int argCount, char *argValues[])
             }
 
             // Handle data
-            std::cout << "Received: " << tcpBuffer << std::endl;
+            std::cout << tcpBuffer << std::endl;
             timeNow = time(0);
             localTimeNow = localtime(&timeNow);
             char timeStampBuffer[sizeof("2020-09-17_22:34:00")];
