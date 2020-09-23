@@ -48,23 +48,6 @@ int main(int argCount, char *argValues[])
 	    std::cerr << "setsockopt(SO_REUSEADDR) failed" << std::endl;
         return -1;
     }
-    
-    struct timeval timeValue;
-    timeValue.tv_sec = 1;
-    timeValue.tv_usec = 0;
-
-    returnValue = setsockopt(
-        socketDescriptor,
-        SOL_SOCKET,
-        SO_RCVTIMEO,
-        reinterpret_cast<const char*>(&timeValue),
-        sizeof(timeValue));
-
-    if (returnValue < 0)
-    {
-	    std::cerr << "setsockopt(SO_RCVTIMEO) failed" << std::endl;
-        return -1;
-    }
 
     // Create socketAddress
     struct sockaddr_in socketAddress;
@@ -116,7 +99,7 @@ int main(int argCount, char *argValues[])
 
         struct timeval timeValue = {1,0};
         int returnValue;
-        
+
         returnValue = setsockopt(
             clientDescriptor,
             SOL_SOCKET,
