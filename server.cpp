@@ -46,16 +46,25 @@ int main(int argCount, char *argValues[])
     if (returnValue < 0)
     {
 	    std::cerr << "setsockopt(SO_REUSEADDR) failed" << std::endl;
+        return -1;
     }
     
-    struct timeval timeValue = {0,500};
+    struct timeval timeValue;
+    timeValue.tv_sec = 1;
+    timeValue.tv_usec = 0;
 
     returnValue = setsockopt(
         socketDescriptor,
         SOL_SOCKET,
         SO_RCVTIMEO,
-        &timeValue,
-        sizeof(int));
+        reinterpret_cast<const char*>(&timeValue),
+        sizeof(timeValue));
+
+    if (returnValue < 0)
+    {
+	    std::cerr << "setsockopt(SO_RCVTIMEO) failed" << std::endl;
+        return -1;
+    }
 
     // Create socketAddress
     struct sockaddr_in socketAddress;
@@ -77,19 +86,6 @@ int main(int argCount, char *argValues[])
         return -1;
     }
 
-    // Set socket options
-    // int socketOptions = 1;
-    // if (setsockopt(
-    //     socketDescriptor,
-    //     SOL_SOCKET,
-    //     SO_REUSEADDR | SO_REUSEPORT,
-    //     &socketOptions,
-    //     sizeof(socketOptions)))
-    // { 
-    //     std::cerr << "setsockopt() error" << std::endl; 
-    //     return(-1); 
-    // } 
-
     // Listen for connections
     listen(socketDescriptor, SOMAXCONN);
 
@@ -98,6 +94,8 @@ int main(int argCount, char *argValues[])
         sockaddr_in clientAddress;
         int clientDescriptor;
         socklen_t clientLength = sizeof(clientAddress);
+
+        std::cout << "Waiting for connection..." << std::flush;
 
         // Accept new connection
         clientDescriptor = accept(
@@ -112,10 +110,29 @@ int main(int argCount, char *argValues[])
             return -1;
         }
 
+        std::cout << "accepted" << std::endl;
+
+        // Set recieve timeout
+
+        returnValue = setsockopt(
+            clientDescriptor,
+            SOL_SOCKET,
+            SO_RCVTIMEO,
+            reinterpret_cast<const char*>(&timeValue),
+            sizeof(timeValue));
+
+        if (returnValue < 0)
+        {
+            std::cerr << "setsockopt(SO_RCVTIMEO) failed" << std::endl;
+            return -1;
+        }
+
         while (1)
         {
             int byteCount;
             char tcpBuffer[1024];
+
+            std::cout << "Reading..." << std::flush;
 
             // Read in data
             byteCount = read(
@@ -131,7 +148,7 @@ int main(int argCount, char *argValues[])
             }
 
             // Handle data
-            std::cout << "Received: " << tcpBuffer << std::endl;
+            std::cout << tcpBuffer << std::endl;
             timeNow = time(0);
             localTimeNow = localtime(&timeNow);
             char timeStampBuffer[sizeof("2020-09-17_22:34:00")];
