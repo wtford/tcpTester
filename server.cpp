@@ -35,6 +35,12 @@ int main(int argCount, char *argValues[])
         return -1;
     }
 
+    int optionValue= 1;
+    if (setsockopt(socketDescriptor, SOL_SOCKET, SO_REUSEADDR, &optionValue, sizeof(int)) < 0)
+    {
+	    std::cerr << "setsockopt(SO_REUSEADDR) failed" << std::endl;
+    }
+
     // Create socketAddress
     struct sockaddr_in socketAddress;
     memset(&socketAddress, 0, sizeof(socketAddress));
