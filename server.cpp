@@ -96,8 +96,8 @@ int main(int argCount, char *argValues[])
         std::cout << "accepted" << std::endl;
 
         // Set recieve timeout
-
-        struct timeval timeValue = {1,0};
+#if 1
+        struct timeval timeValue = {120,0};
         int returnValue;
 
         returnValue = setsockopt(
@@ -112,7 +112,7 @@ int main(int argCount, char *argValues[])
             std::cerr << "setsockopt(SO_RCVTIMEO) failed" << std::endl;
             return -1;
         }
-
+#endif
         while (1)
         {
             int byteCount;
@@ -145,6 +145,9 @@ int main(int argCount, char *argValues[])
                 localTimeNow);
             logFile << timeStampBuffer << " " << tcpBuffer << std::endl;
         }
+        
+	// Close client socket
+	close(clientDescriptor);
     }
 
     logFile.close();
