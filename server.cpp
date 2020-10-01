@@ -133,8 +133,15 @@ int main(int argCount, char *argValues[])
                 break;
             }
 
+            if (byteCount >= sizeof(tcpBuffer))
+            {
+                byteCount = sizeof(tcpBuffer) - 1;
+            }
+            
+            tcpBuffer[byteCount] = '\0';
+
             // Handle data
-            std::cout << tcpBuffer << std::endl;
+            std::cout << "(" << byteCount << ") " << tcpBuffer << std::endl;
             timeNow = time(0);
             localTimeNow = localtime(&timeNow);
             char timeStampBuffer[sizeof("2020-09-17_22:34:00")];
